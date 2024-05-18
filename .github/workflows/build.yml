@@ -21,6 +21,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          mongodb-version: latest
+
       - uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -30,4 +35,4 @@ jobs:
           java-version: '17'
 
       - name: Build with Maven
-        run: mvn spring-boot:build-image -DskipTests -Dspring-boot.build-image.imageName=rhubner/lion -Ddocker.publishRegistry.username=${{ secrets.DOCKERHUB_USERNAME }} -Ddocker.publishRegistry.password=${{ secrets.DOCKERHUB_TOKEN }}
+        run: mvn spring-boot:build-image -Dstorage.path=${{ env.RUNNER_TEMP }} -Dspring-boot.build-image.imageName=rhubner/lion -Ddocker.publishRegistry.username=${{ secrets.DOCKERHUB_USERNAME }} -Ddocker.publishRegistry.password=${{ secrets.DOCKERHUB_TOKEN }}
