@@ -1,6 +1,7 @@
 package com.example.lion.controller;
 
 import com.example.lion.repository.StoredFileRepository;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +10,13 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.StreamingHttpOutputMessage;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,7 +26,9 @@ public class UploadControllerRestTest {
     @LocalServerPort
     private int port;
 
-    private RestClient restClient = RestClient.create();
+    private RestClient restClient = RestClient.builder()
+            .defaultHeader("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
+            .build();
 
     @Autowired
     private StoredFileRepository storedFileRepository;
@@ -170,17 +175,45 @@ public class UploadControllerRestTest {
 
     }
 
+    @Test
+    public void testUploadJpeg() throws IOException {
+        final var FILENAME = "img.lossy";
+
+        var data = IOUtils.resourceToByteArray("/img.lossy");
+        var body = new StreamingHttpOutputMessage.Body() { //Custom body to prevent setting default content type.
+            @Override
+            public void writeTo(OutputStream outputStream) throws IOException {
+                outputStream.write(data);
+            }
+        };
+
+        var result = restClient.put()
+                .uri(fileUrlPrefix() + FILENAME)
+                .body(body)
+                .contentType(null)
+                .header(UploadController.VISIBILITY_HTTP_HEADER, "PUBLIC")
+                .retrieve()
+                .toEntity(String.class);
+        assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+
+        var downloadResult = restClient.get()
+                .uri(fileUrlPrefix() + FILENAME)
+                .retrieve()
+                .toEntity(byte[].class);
+        assertThat(downloadResult.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        var contentType = downloadResult.getHeaders().get(HttpHeaders.CONTENT_TYPE);
+        assertThat(contentType).isNotEmpty();
+        assertThat(contentType.get(0)).isEqualTo("image/jpeg");
+    }
+
     public String fileUrlPrefix() {
         return "http://localhost:" + port + "/file/";
     }
 
-
     private static final class NoOpResponseErrorHandler extends DefaultResponseErrorHandler {
-
         @Override
         public void handleError(ClientHttpResponse response) throws IOException {
         }
-
     }
 
 }

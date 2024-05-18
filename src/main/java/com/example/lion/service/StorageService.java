@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import static org.springframework.data.mongodb.core.query.Criteria.*;
 
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 
@@ -33,6 +35,9 @@ public class StorageService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private TikaMimeTypeDetector mimeTypeDetector;
+
     public void storeFile(String fileName, String[] tags, Optional<String> contentType, Visibility visibility, InputStream in) throws IOException, DuplicateFileException {
         var uuid = UUID.randomUUID();
 
@@ -52,8 +57,10 @@ public class StorageService {
             throw new DuplicateFileException(DuplicateFileException.DuplicateReason.NAME);
         }
 
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
         var file = new StoredFile(uuid.toString(), tags, visibility, fileName, Files.size(fileDestination),
-                "radek", sha256, Instant.now(), contentType.orElse("application/octet-stream"));
+                authentication.getName(), sha256, Instant.now(), contentType.orElse(mimeTypeDetector.detectFile(fileDestination)));
         repository.save(file);
 
     }
@@ -68,12 +75,26 @@ public class StorageService {
     }
 
     public Optional<StoredFile> getFileMetaData(String fileName) {
-        return repository.findByName(fileName);
+        var fileMetadata = repository.findByName(fileName);
+        if(fileMetadata.isPresent()) {
+            var authentication = SecurityContextHolder.getContext().getAuthentication();
+            if(fileMetadata.get().getVisibility() == Visibility.PUBLIC) {
+                return fileMetadata;
+            }else {
+                if (authentication != null && authentication.getName().equals(fileMetadata.get().getUser())) {
+                    return fileMetadata;
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     public void rename(String oldName, String newName) {
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
         var renameResult = mongoTemplate.update(StoredFile.class)
-                .matching(where("name").is(oldName))
+                .matching(where("name").is(oldName).and("user").is(authentication.getName()))
                 .apply(new Update().set("name", newName))
                 .first();
 
@@ -83,10 +104,13 @@ public class StorageService {
     }
 
     public void delete(String fileName) throws IOException {
-        //repository.deleteById(fileName);
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
         var fileMetadata = repository.findByName(fileName);
-        if(fileMetadata.isPresent()) {
+        if(fileMetadata.isPresent() && fileMetadata.get().getUser().equals(authentication.getName())) {
             Files.deleteIfExists(destination.resolve(fileMetadata.get().getId()));
+            //repository.deleteById(fileMetadata.get().getId());
         } else {
             throw new RuntimeException("Not found");
         }
