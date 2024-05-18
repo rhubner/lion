@@ -41,12 +41,15 @@ public class ListControllerRestTest {
 
         uploadFile("single-file.bin", new byte[] {5,6,7,3,1,2,1,2,2,2}, Visibility.PRIVATE, "dubai");
 
-        for(int i = 0 ; i < 10 ; i++) {
-            uploadFile("public-file" + i, new byte[] {1,2,3, (byte) i}, Visibility.PUBLIC, "picture,tag" + i);
+        for(int i = 0 ; i < 17 ; i++) {
+            String formatted = String.format("%02d",i);
+            uploadFile("public-file" + formatted, new byte[] {1,2,3, (byte) i}, Visibility.PUBLIC, "picture,tag" + i);
         }
 
-        for(int i = 0 ; i < 10 ; i++) {
-            uploadFile("private-file" + i, new byte[] {3,2,1, (byte) i}, Visibility.PRIVATE, "picture,tag" + i);
+        for(int i = 0 ; i < 17 ; i++) {
+            String formatted = String.format("%02d",i);
+
+            uploadFile("private-file" + formatted, new byte[] {3,2,1, (byte) i}, Visibility.PRIVATE, "picture,tag" + i);
         }
 
     }
@@ -60,6 +63,22 @@ public class ListControllerRestTest {
                                 .queryParam("visibility", "PRIVATE")
                                 .build()
                         )
+                .retrieve()
+                .toEntity(String.class);
+        assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        System.out.println(result.getBody());
+    }
+
+    @Test
+    public void testPage() {
+
+        var result = restClient.get()
+                .uri(uriBuilder -> setupListUrl(uriBuilder)
+                        .queryParam("visibility", "PRIVATE")
+                        .queryParam("page", "1")
+                        .queryParam("sortBy", "name")
+                        .build()
+                )
                 .retrieve()
                 .toEntity(String.class);
         assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());

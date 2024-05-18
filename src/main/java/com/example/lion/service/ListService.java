@@ -3,6 +3,7 @@ package com.example.lion.service;
 import com.example.lion.domain.StoredFile;
 import com.example.lion.domain.Visibility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Collation;
@@ -25,7 +26,7 @@ public class ListService {
     public List<StoredFile> listFiles(
             Visibility visibility,
             String tagFilter,
-            String sortBy
+            Pageable pageable
     ) {
         final var user = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -36,11 +37,8 @@ public class ListService {
         }
 
         var query = new Query(criteria);
-        if(sortBy != null) {
-            query = query.with(Sort.by(sortBy));
-        }
 
-        var result = mongoTemplate.find(query, StoredFile.class);
+        var result = mongoTemplate.find(query.with(pageable), StoredFile.class);
 
         return result;
     }
