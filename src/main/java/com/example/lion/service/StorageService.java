@@ -110,7 +110,7 @@ public class StorageService {
         var fileMetadata = repository.findByName(fileName);
         if(fileMetadata.isPresent() && fileMetadata.get().getUser().equals(authentication.getName())) {
             Files.deleteIfExists(destination.resolve(fileMetadata.get().getId()));
-            //repository.deleteById(fileMetadata.get().getId());
+            repository.deleteById(fileMetadata.get().getId());
         } else {
             throw new RuntimeException("Not found");
         }
