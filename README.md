@@ -1,10 +1,21 @@
-
-
 # Lion
 _The storage app_
 
 This app allows user to upload and download file. Files Uploaded with permission PUBLIC can be downloaded by other users.
 It doesn't allow anonymous download of public files.
+
+### Running application
+
+The easy option is to use prepare docker compose file.
+
+```bash
+docker-compose -f stack.yml up
+```
+To remove stack :
+
+```bash
+docker-compose -f stack.yml down
+```
 
 ## API descriptions
 
@@ -20,8 +31,8 @@ URL: `/file/{filename}`
 
 Http headers : 
  * `x-visibility` (Mandatory) - Valid options `PUBLIC`, `PRIVATE`.
-   * `x-tags` (optional) - Up to 4 tags comma separated. For example: `picture,holiday,dubai`
- * `Content-Type`(Optional) - User defined content type. If not specified, system will try to detect content type based on the content.
+ * `x-tags` (optional) - Up to 4 tags comma separated. For example: `picture,holiday,dubai`
+ * `Content-Type` (Optional) — User defined content type. If not specified, a system will try to detect a content type based on the content.
 
 Example request : 
 
@@ -146,3 +157,7 @@ This application is not perfect. It was created as a demonstration only in time 
   this allows us to use name as identifier, and it's probably easier for user.
 * better validation and wired range of input data. I simplify my implementation to only allow [a-z0-9] characters for all possible inputs.
   I think the system should be able to work with all kinds of UNICODE characters. Maybe even treat them as binary data.
+* Use [DROID](https://github.com/digital-preservation/droid) from [The National Archives](https://www.nationalarchives.gov.uk/) for mime type detection.
+  I spend a lot of time [improving this tool](https://github.com/digital-preservation/droid/pulls?q=is%3Apr+author%3Arhubner). 
+  Unfortunately, it's not easy to integrate as Apache Tika. I was working on easy integration, but the National archives didn't 
+  get money from the budget to continue.

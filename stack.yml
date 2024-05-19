@@ -1,0 +1,17 @@
+version: '3.1'
+
+services:
+
+  lion:
+    image: rhubner/lion:latest
+    restart: always
+    environment:
+      JAVA_TOOL_OPTIONS: '-Dstorage.path=/tmp -Dspring.data.mongodb.uri=mongodb://lion-mongo:27017/lion'
+    ports:
+      - 8080:8080
+
+  lion-mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
