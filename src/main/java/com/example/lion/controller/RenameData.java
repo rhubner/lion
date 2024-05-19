@@ -1,6 +1,11 @@
 package com.example.lion.controller;
 
+import jakarta.validation.constraints.Pattern;
+import org.springframework.validation.annotation.Validated;
+
+@Validated
 public class RenameData {
+    @Pattern(regexp = UploadController.FILENAME_PATTERN)
     private String newFileName;
 
     public RenameData() {
