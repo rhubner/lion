@@ -3,12 +3,16 @@ package com.example.lion.controller;
 
 import com.example.lion.domain.Visibility;
 import com.example.lion.service.StorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +31,11 @@ public class UploadController {
     @Autowired
     private StorageService storageService;
 
+    @Value("${server.url}" )
+    private String serverUrl;
+
     @PutMapping("/{filename}")
-    public String putFile(
+    public ObjectNode putFile(
             @PathVariable("filename") String fileName,
             @RequestHeader(value = TAGS_HTTP_HEADER, required = false) String tag,
             @RequestHeader(value = VISIBILITY_HTTP_HEADER) String visibilityHeader,
@@ -43,7 +50,15 @@ public class UploadController {
         }else {
             storageService.storeFile(fileName, new String[] {}, contentType, visibility, inputStream);
         }
-        return "{url: 'http://localhost:8080/" + fileName + "}";
+        var uri = UriComponentsBuilder.fromHttpUrl(serverUrl)
+                .pathSegment("file")
+                .pathSegment(fileName).build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        var root = mapper.createObjectNode();
+        root.put("url", uri.toString());
+
+        return root;
     }
 
     @GetMapping("/{filename}")
