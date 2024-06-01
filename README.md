@@ -153,7 +153,7 @@ This application is not perfect. It was created as a demonstration only in time 
 * Authentication - Http basic is not the best type of authentication. Secret token or oAuth will be better.
 * Better testing. At the moment application contains minimum amount of test. Probably there are some errors that 
   can be easily detected with more unite/integration testing.
-* Split between database model and presentation model. At the moment `list` endpoint return same data as we have in data.
+* ~~~Split between database model and presentation model. At the moment `list` endpoint return same data as we have in data.~~~
 * Use ID for all other interaction. Because stored file can be renamed, I decided to use UUID as _id_ in database and also name of the file on filesystem.
   Maybe it will be better to use this ID also for rename, delete, get. On other had, one requirments is that name is unique,
   this allows us to use name as identifier, and it's probably easier for user.

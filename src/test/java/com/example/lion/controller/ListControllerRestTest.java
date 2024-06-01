@@ -1,5 +1,6 @@
 package com.example.lion.controller;
 
+import com.example.lion.controller.model.StoredFileDTO;
 import com.example.lion.domain.Visibility;
 import com.example.lion.repository.StoredFileRepository;
 import org.apache.commons.io.IOUtils;
@@ -7,10 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.StreamingHttpOutputMessage;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -33,13 +33,19 @@ public class ListControllerRestTest {
             .build();
 
     @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
     private StoredFileRepository storedFileRepository;
 
     @BeforeEach
-    public void before() {
+    public void before() throws IOException {
         storedFileRepository.deleteAll();
 
         uploadFile("single-file.bin", new byte[] {5,6,7,3,1,2,1,2,2,2}, Visibility.PRIVATE, "dubai");
+
+        uploadFile("burj-khalifa.jpg", IOUtils.resourceToByteArray("/img.lossy"), Visibility.PRIVATE, "burj-khalifa,jpg");
+        uploadFile("burj-khalifa.png", IOUtils.resourceToByteArray("/img.lossless"), Visibility.PRIVATE, "burj-khalifa,png");
 
         for(int i = 0 ; i < 17 ; i++) {
             String formatted = String.format("%02d",i);
@@ -55,18 +61,38 @@ public class ListControllerRestTest {
     }
 
     @Test
-    public void testList() {
+    public void listPublicFiles() {
+        var result = restTemplate
+                .withBasicAuth("user", "password")
+                .getForEntity(listUrlPrefix(),
+                StoredFileDTO[].class
+                );
 
-        var result = restClient.get()
-                .uri(uriBuilder -> setupListUrl(uriBuilder)
-                                .queryParam("tags", "dubai")
-                                .queryParam("visibility", "PRIVATE")
-                                .build()
-                        )
-                .retrieve()
-                .toEntity(String.class);
-        assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        System.out.println(result.getBody());
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody()).hasSize(10);
+        assertThat(result.getBody()).anyMatch(x -> x.getName().equals("public-file01"));
+
+    }
+
+    @Test
+    public void listWithMimeType() {
+        var result = restTemplate
+                .withBasicAuth("user", "password")
+                .getForEntity(listUrlPrefix() + "?visibility=PRIVATE&tags=burj-khalifa&sortBy=uploadDate",
+                        StoredFileDTO[].class
+                );
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var body = result.getBody();
+        assertThat(body).hasSize(2);
+        assertThat(body)
+                .extracting(StoredFileDTO::getContentType)
+                .containsExactly("image/jpeg", "image/png");
+
+        //TODO - File is not on this URL. How to distinguish between URL for testing and production.
+        //     - Service can be behind proxy and port number may not be valid.
+        assertThat(body[0].getUrl()).isEqualTo("http://localhost:8080/file/burj-khalifa.jpg");
+
     }
 
     @Test
@@ -88,9 +114,18 @@ public class ListControllerRestTest {
 
 
     private void uploadFile(String filename, byte[] data, Visibility visibility, String tag) {
+
+        var body = new StreamingHttpOutputMessage.Body() { //Custom body to prevent setting default content type.
+            @Override
+            public void writeTo(OutputStream outputStream) throws IOException {
+                outputStream.write(data);
+            }
+        };
+
         var request = restClient.put()
                 .uri(fileUrlPrefix() + filename)
-                .body(data)
+                .contentType(null)
+                .body(body)
                 .header(UploadController.VISIBILITY_HTTP_HEADER, visibility.name());
         if(tag != null) {
             request = request.header(UploadController.TAGS_HTTP_HEADER, tag);

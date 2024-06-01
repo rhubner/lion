@@ -38,6 +38,23 @@ public class StorageService {
     @Autowired
     private TikaMimeTypeDetector mimeTypeDetector;
 
+
+    public void setDestination(Path destination) {
+        this.destination = destination;
+    }
+
+    public void setRepository(StoredFileRepository repository) {
+        this.repository = repository;
+    }
+
+    public void setMongoTemplate(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    public void setMimeTypeDetector(TikaMimeTypeDetector mimeTypeDetector) {
+        this.mimeTypeDetector = mimeTypeDetector;
+    }
+
     public void storeFile(String fileName, String[] tags, Optional<String> contentType, Visibility visibility, InputStream in) throws IOException, DuplicateFileException {
         var uuid = UUID.randomUUID();
 
