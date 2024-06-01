@@ -143,10 +143,10 @@ $ curl -u user:password 'http://localhost:8080/list?visibility=PRIVATE&sortBy=na
 ## Implementation notes
 
 This application is not perfect. It was created as a demonstration only in time pressure. Some ideas what can be improved 
-* Duplicate file detection. In *VERY* rare case, sha256 checksum may not be enough to detect duplicate files. 
+* Duplicate file detection. In **VERY** rare case, sha256 checksum may not be enough to detect duplicate files. 
   To be 100% sure, we may need to compare the content of the files.
-* Error reporting. At the moment, I focus only on _happy path_ and didn't set up properly error management. 
-  The Application should be able to return proper error, so that user knows what went wrong.
+* ~~Error reporting. At the moment, I focus only on _happy path_ and didn't set up properly error management. 
+  The Application should be able to return proper error, so that user knows what went wrong.~~
 * Database model and indexes. At the moment, we have only a few indexes, and they even don't help too much with queries.
 * Transaction over multiple sources. We store file, and then store data in a database. This is interaction with two data sources.
   If one fails, we should be able to recover from that state. For example, we should not leave file on filesystem when we detect duplicate file.

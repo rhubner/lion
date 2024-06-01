@@ -70,7 +70,7 @@ public class StorageService {
         if(fileMetadata.isPresent()) {
             return destination.resolve(fileMetadata.get().getId());
         } else {
-            throw new RuntimeException("Not found");
+            throw new FileNotFoundException(fileName);
         }
     }
 
@@ -99,7 +99,7 @@ public class StorageService {
                 .first();
 
         if(renameResult.getMatchedCount() != 1) {
-            throw new RuntimeException("not found");
+            throw new FileNotFoundException(oldName);
         }
     }
 
@@ -112,7 +112,7 @@ public class StorageService {
             Files.deleteIfExists(destination.resolve(fileMetadata.get().getId()));
             repository.deleteById(fileMetadata.get().getId());
         } else {
-            throw new RuntimeException("Not found");
+            throw new FileNotFoundException(fileName);
         }
     }
 
