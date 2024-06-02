@@ -5,7 +5,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 public class RenameData {
-    @Pattern(regexp = UploadController.FILENAME_PATTERN)
+    @Pattern(regexp = FileController.FILENAME_PATTERN)
     private String newFileName;
 
     public RenameData() {

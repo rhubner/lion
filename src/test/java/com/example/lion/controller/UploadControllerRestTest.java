@@ -45,8 +45,8 @@ public class UploadControllerRestTest {
         var result = restClient.put()
                 .uri(fileUrlPrefix() + FILENAME)
                 .body(new byte[] {1,2,3,4,5,6,7,8,9,10})
-                .header(UploadController.VISIBILITY_HTTP_HEADER, "PUBLIC")
-                .header(UploadController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
+                .header(FileController.VISIBILITY_HTTP_HEADER, "PUBLIC")
+                .header(FileController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
                 .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
                 .retrieve()
                 .toEntity(String.class);
@@ -57,7 +57,7 @@ public class UploadControllerRestTest {
                 .retrieve()
                 .toEntity(byte[].class);
         assertThat(downloadResult.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        var tagsHeader = downloadResult.getHeaders().get(UploadController.TAGS_HTTP_HEADER);
+        var tagsHeader = downloadResult.getHeaders().get(FileController.TAGS_HTTP_HEADER);
         assertThat(tagsHeader).isNotEmpty();
         assertThat(tagsHeader.get(0)).isEqualTo("hello,radek,another-tag");
 
@@ -86,8 +86,8 @@ public class UploadControllerRestTest {
         var result = restClient.put()
                 .uri(fileUrlPrefix() + FILENAME)
                 .body(new byte[] {1,2,3,4,5,6,7,8,9,10})
-                .header(UploadController.VISIBILITY_HTTP_HEADER, "PUBLIC")
-                .header(UploadController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
+                .header(FileController.VISIBILITY_HTTP_HEADER, "PUBLIC")
+                .header(FileController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
                 .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
                 .retrieve()
                 .toEntity(String.class);
@@ -109,7 +109,7 @@ public class UploadControllerRestTest {
                 .retrieve()
                 .toEntity(byte[].class);
         assertThat(downloadResult.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        var tagsHeader = downloadResult.getHeaders().get(UploadController.TAGS_HTTP_HEADER);
+        var tagsHeader = downloadResult.getHeaders().get(FileController.TAGS_HTTP_HEADER);
         assertThat(tagsHeader).isNotEmpty();
         assertThat(tagsHeader.get(0)).isEqualTo("hello,radek,another-tag");
 
@@ -136,8 +136,8 @@ public class UploadControllerRestTest {
         var result = restClient.put()
                 .uri(fileUrlPrefix() + FILENAME)
                 .body(new byte[] {1,2,3,4,5,6,7,8,9,10})
-                .header(UploadController.VISIBILITY_HTTP_HEADER, "PUBLIC")
-                .header(UploadController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
+                .header(FileController.VISIBILITY_HTTP_HEADER, "PUBLIC")
+                .header(FileController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
                 .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
                 .retrieve()
                 .toEntity(String.class);
@@ -147,8 +147,8 @@ public class UploadControllerRestTest {
         var result2 = restClient.put()
                 .uri(fileUrlPrefix() + "otherName.bin")
                 .body(new byte[] {1,2,3,4,5,6,7,8,9,10})
-                .header(UploadController.VISIBILITY_HTTP_HEADER, "PUBLIC")
-                .header(UploadController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
+                .header(FileController.VISIBILITY_HTTP_HEADER, "PUBLIC")
+                .header(FileController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
                 .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
                 .retrieve()
                 .onStatus(new NoOpResponseErrorHandler())
@@ -158,8 +158,8 @@ public class UploadControllerRestTest {
         var result3 = restClient.put()
                 .uri(fileUrlPrefix() + FILENAME)
                 .body(new byte[] {10,9,8,7,6,5,4,3,2,1})
-                .header(UploadController.VISIBILITY_HTTP_HEADER, "PUBLIC")
-                .header(UploadController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
+                .header(FileController.VISIBILITY_HTTP_HEADER, "PUBLIC")
+                .header(FileController.TAGS_HTTP_HEADER, "hello,radek,another-tag")
                 .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
                 .retrieve()
                 .onStatus(new NoOpResponseErrorHandler())
@@ -191,7 +191,7 @@ public class UploadControllerRestTest {
                 .uri(fileUrlPrefix() + FILENAME)
                 .body(body)
                 .contentType(null)
-                .header(UploadController.VISIBILITY_HTTP_HEADER, "PUBLIC")
+                .header(FileController.VISIBILITY_HTTP_HEADER, "PUBLIC")
                 .retrieve()
                 .toEntity(String.class);
         assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());

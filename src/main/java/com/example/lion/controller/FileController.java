@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/file")
 @Validated
-public class UploadController {
+public class FileController {
 
     public static final String TAGS_HTTP_HEADER = "x-tags";
     public static final String VISIBILITY_HTTP_HEADER = "x-visibility";

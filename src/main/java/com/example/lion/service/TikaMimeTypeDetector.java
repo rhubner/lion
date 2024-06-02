@@ -14,15 +14,15 @@ import java.nio.file.Path;
 @Component
 public class TikaMimeTypeDetector {
 
-    TikaConfig tika = new TikaConfig();
+    private TikaConfig tika = new TikaConfig();
 
     public TikaMimeTypeDetector() throws TikaException, IOException {
     }
 
     public String detectFile(Path file) throws IOException {
         var metadata = new Metadata();
-        var xxx = tika.getDetector().detect(TikaInputStream.get(file), metadata);
-        return xxx.toString();
+        var mediaType = tika.getDetector().detect(TikaInputStream.get(file), metadata);
+        return mediaType.toString();
     }
 
 

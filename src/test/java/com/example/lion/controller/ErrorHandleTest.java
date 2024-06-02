@@ -13,7 +13,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.RestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,7 +47,7 @@ public class ErrorHandleTest {
     public void duplicateContent() {
 
         var headers = new HttpHeaders();
-        headers.add(UploadController.VISIBILITY_HTTP_HEADER, "PRIVATE");
+        headers.add(FileController.VISIBILITY_HTTP_HEADER, "PRIVATE");
 
         var requestEntity = new HttpEntity<byte[]>(new byte[] {1,2,3,4,5}, headers);
 
@@ -75,7 +74,7 @@ public class ErrorHandleTest {
     public void duplicateName() {
 
         var headers = new HttpHeaders();
-        headers.add(UploadController.VISIBILITY_HTTP_HEADER, "PRIVATE");
+        headers.add(FileController.VISIBILITY_HTTP_HEADER, "PRIVATE");
 
         var requestEntity = new HttpEntity<byte[]>(new byte[] {1,2,3,4,5}, headers);
 

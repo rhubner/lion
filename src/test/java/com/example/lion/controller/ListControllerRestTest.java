@@ -126,9 +126,9 @@ public class ListControllerRestTest {
                 .uri(fileUrlPrefix() + filename)
                 .contentType(null)
                 .body(body)
-                .header(UploadController.VISIBILITY_HTTP_HEADER, visibility.name());
+                .header(FileController.VISIBILITY_HTTP_HEADER, visibility.name());
         if(tag != null) {
-            request = request.header(UploadController.TAGS_HTTP_HEADER, tag);
+            request = request.header(FileController.TAGS_HTTP_HEADER, tag);
         }
         request.retrieve().toEntity(String.class);
     }

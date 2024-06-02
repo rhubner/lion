@@ -151,7 +151,7 @@ This application is not perfect. It was created as a demonstration only in time 
 * Transaction over multiple sources. We store file, and then store data in a database. This is interaction with two data sources.
   If one fails, we should be able to recover from that state. For example, we should not leave file on filesystem when we detect duplicate file.
 * Authentication - Http basic is not the best type of authentication. Secret token or oAuth will be better.
-* Better testing. At the moment application contains minimum amount of test. Probably there are some errors that 
+* ~~Better testing. At the moment application contains minimum amount of test. Probably there are some errors that~~ 
   can be easily detected with more unite/integration testing.
 * ~~~Split between database model and presentation model. At the moment `list` endpoint return same data as we have in data.~~~
 * Use ID for all other interaction. Because stored file can be renamed, I decided to use UUID as _id_ in database and also name of the file on filesystem.
