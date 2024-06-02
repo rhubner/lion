@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -21,8 +23,15 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain configureSecurity(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(request -> request.requestMatchers(
+                        new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
+                )
+                .authorizeHttpRequests(request -> request.requestMatchers(
+                        new AntPathRequestMatcher("/v3/**")).permitAll()
+                )
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().authenticated())
+                        .anyRequest().authenticated()
+                        )
                 .httpBasic(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

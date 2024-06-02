@@ -1,24 +1,33 @@
 package com.example.lion.controller.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.Instant;
 
+@Schema(description = "Search output model")
 public class StoredFileDTO {
 
+    @Schema(description = "Name of the file", example = "burj-khalifa.jpg", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
+    @Schema(description = "Up to 5 user defined tags. or empty array", example = "[\"downtown\", \"holiday\", \"UAE\"]", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String[] tags;
+    @Schema(description = "Autodetected or user defined content type.", example = "image/jpeg", requiredMode = Schema.RequiredMode.REQUIRED)
     private String contentType;
-    private Instant uploadDare;
+    @Schema(description = "Upload timestamp", example = "2024-04-13T08:30:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Instant uploadDate;
+    @Schema(description = "URL for file download", example = "http://localhost/file/burj-khalifa.jpg", requiredMode = Schema.RequiredMode.REQUIRED)
     private String url;
+    @Schema(description = "File size", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     private long size;
 
     public StoredFileDTO() {
     }
 
-    public StoredFileDTO(String name, String[] tags, String contentType, Instant uploadDare, String url, long size) {
+    public StoredFileDTO(String name, String[] tags, String contentType, Instant uploadDate, String url, long size) {
         this.name = name;
         this.tags = tags;
         this.contentType = contentType;
-        this.uploadDare = uploadDare;
+        this.uploadDate = uploadDate;
         this.url = url;
         this.size = size;
     }
@@ -47,12 +56,12 @@ public class StoredFileDTO {
         this.contentType = contentType;
     }
 
-    public Instant getUploadDare() {
-        return uploadDare;
+    public Instant getUploadDate() {
+        return uploadDate;
     }
 
-    public void setUploadDare(Instant uploadDare) {
-        this.uploadDare = uploadDare;
+    public void setUploadDate(Instant uploadDate) {
+        this.uploadDate = uploadDate;
     }
 
     public String getUrl() {

@@ -19,6 +19,11 @@ docker-compose -f stack.yml down
 
 ## API descriptions
 
+Use [Swagger-UI](http://localhost:8080/swagger-ui/index.html) or 
+[OpenAPI](http://localhost:8080/v3/api-docs)  
+
+## API descriptions  - Deprecated Use OpenAPI
+
 All api endpoint are secured with http basic authorisation.
 
 ## File API
